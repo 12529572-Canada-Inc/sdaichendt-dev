@@ -1,6 +1,14 @@
 import { ArrowDown } from "lucide-react";
 import { GithubIcon, LinkedinIcon } from "@/components/Icons";
 
+function SubstackIcon({ size = 20, className = "" }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">
+      <path d="M22.539 8.242H1.46V5.406h21.08v2.836zM1.46 10.812V24L12 18.11 22.54 24V10.812H1.46zM22.54 0H1.46v2.836h21.08V0z" />
+    </svg>
+  );
+}
+
 export default function Hero() {
   return (
     <section className="min-h-screen flex flex-col justify-center relative overflow-hidden px-6">
@@ -61,6 +69,15 @@ export default function Hero() {
               aria-label="LinkedIn"
             >
               <LinkedinIcon size={20} />
+            </a>
+            <a
+              href="https://open.substack.com/pub/sdaichendt"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-gray-500 hover:text-white transition-colors"
+              aria-label="Substack"
+            >
+              <SubstackIcon size={20} />
             </a>
           </div>
         </div>
