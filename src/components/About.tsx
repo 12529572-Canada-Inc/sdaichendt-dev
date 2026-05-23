@@ -13,8 +13,8 @@ const highlights = [
   },
   {
     icon: MapPin,
-    label: "Toronto, ON",
-    detail: "available remotely worldwide",
+    label: "Windsor/Detroit area",
+    detail: "living and working locally, available remotely worldwide",
   },
 ];
 

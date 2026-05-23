@@ -30,10 +30,10 @@ export default function Hero() {
           </h1>
 
           <p className="text-gray-400 text-lg md:text-xl leading-relaxed mb-10 max-w-2xl">
-            Full-stack developer and indie maker based in Toronto. 12+ years shipping software — from
-            enterprise platforms at GM and Ford to scrappy side projects I can&apos;t stop thinking
-            about. I love the whole thing: the messy idea, the late-night debug session, and the
-            moment it finally clicks.
+            Full-stack developer and indie maker. I live and work in the Windsor/Detroit area. 12+
+            years shipping software — from enterprise platforms at GM and Ford to scrappy side
+            projects I can&apos;t stop thinking about. I love the whole thing: the messy idea, the
+            late-night debug session, and the moment it finally clicks.
           </p>
 
           <div className="flex flex-wrap gap-4">

@@ -15,11 +15,11 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Shawn Daichendt — Full-Stack Developer & Indie Maker",
   description:
-    "Toronto-based full-stack developer with 12+ years of experience. I build web apps, games, and creative projects. Available for freelance and consulting.",
+    "Windsor/Detroit-area full-stack developer with 12+ years of experience. I build web apps, games, and creative projects. Available for freelance and consulting.",
   openGraph: {
     title: "Shawn Daichendt — Full-Stack Developer & Indie Maker",
     description:
-      "Toronto-based full-stack developer with 12+ years of experience. Available for freelance and consulting.",
+      "Windsor/Detroit-area full-stack developer with 12+ years of experience. Available for freelance and consulting.",
     url: "https://sdaichendt.dev",
     siteName: "sdaichendt.dev",
     type: "website",
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Shawn Daichendt — Full-Stack Developer & Indie Maker",
     description:
-      "Toronto-based full-stack developer with 12+ years of experience. Available for freelance and consulting.",
+      "Windsor/Detroit-area full-stack developer with 12+ years of experience. Available for freelance and consulting.",
   },
   metadataBase: new URL("https://sdaichendt.dev"),
 };
