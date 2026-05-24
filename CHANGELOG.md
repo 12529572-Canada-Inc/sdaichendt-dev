@@ -1,0 +1,15 @@
+# Changelog
+
+## Unreleased
+
+- Updated location copy from Toronto to the Windsor/Detroit area in page metadata, the hero intro, and the about highlight.
+- Replaced the site favicon with an `SD` initials icon.
+- Added Vercel Web Analytics to the root layout.
+- Removed GitHub links from project cards and project data.
+- Updated project card links and statuses:
+  - Adeso is tagged as `Early Signup`.
+  - Questify links to `https://questify.co` and remains tagged as `Beta`.
+  - Farsi Flash links to `https://farsi-flash.vercel.app/` and is tagged as `Beta`.
+  - EdgeLedger links to `https://edge-ledger-app.vercel.app/` and is tagged as `Beta`.
+- Updated the current-work list to show only software consulting for Parallel42, linked to `https://www.p42systems.com/`.
+- Added a new in-progress game card for Hollow Castle.

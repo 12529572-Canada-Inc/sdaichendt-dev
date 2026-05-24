@@ -2,12 +2,12 @@
 
 import { useState } from "react";
 import { ExternalLink, ShoppingBag } from "lucide-react";
-import { GithubIcon } from "@/components/Icons";
 import { projects, categories, type ProjectCategory } from "@/data/projects";
 
 const statusColors: Record<string, string> = {
   live: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30",
   beta: "bg-blue-500/20 text-blue-400 border-blue-500/30",
+  "early-signup": "bg-cyan-500/20 text-cyan-300 border-cyan-500/30",
   "in-progress": "bg-amber-500/20 text-amber-400 border-amber-500/30",
   shipped: "bg-purple-500/20 text-purple-400 border-purple-500/30",
 };
@@ -15,6 +15,7 @@ const statusColors: Record<string, string> = {
 const statusLabels: Record<string, string> = {
   live: "Live",
   beta: "Beta",
+  "early-signup": "Early Signup",
   "in-progress": "In Progress",
   shipped: "Shipped",
 };
@@ -90,7 +91,7 @@ export default function Projects() {
                 ))}
               </div>
 
-              {(project.links.live || project.links.github || project.links.store) && (
+              {(project.links.live || project.links.store) && (
                 <div className="flex items-center gap-3 pt-1">
                   {project.links.live && (
                     <a
@@ -101,17 +102,6 @@ export default function Projects() {
                     >
                       <ExternalLink size={14} />
                       Visit
-                    </a>
-                  )}
-                  {project.links.github && (
-                    <a
-                      href={project.links.github}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-1.5 text-sm text-gray-400 hover:text-white transition-colors"
-                    >
-                      <GithubIcon size={14} />
-                      GitHub
                     </a>
                   )}
                   {project.links.store && (
