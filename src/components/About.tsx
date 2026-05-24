@@ -18,6 +18,13 @@ const highlights = [
   },
 ];
 
+const currentWork = [
+  {
+    label: "Software consulting for Parallel42",
+    href: "https://www.p42systems.com/",
+  },
+];
+
 export default function About() {
   return (
     <section id="about" className="py-24 px-6 relative">
@@ -86,15 +93,21 @@ export default function About() {
                 Currently working on
               </p>
               <ul className="space-y-2">
-                {[
-                  "Adeso — AI appliance product",
-                  "Threshold — cosmic horror deckbuilder",
-                  "Piano AR — Meta Quest piano tutor",
-                  "Odoo consulting for AMAP",
-                ].map((item) => (
-                  <li key={item} className="flex items-center gap-2 text-sm text-gray-300">
+                {currentWork.map((item) => (
+                  <li key={item.label} className="flex items-center gap-2 text-sm text-gray-300">
                     <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 shrink-0" />
-                    {item}
+                    {item.href ? (
+                      <a
+                        href={item.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="hover:text-cyan-300 transition-colors"
+                      >
+                        {item.label}
+                      </a>
+                    ) : (
+                      item.label
+                    )}
                   </li>
                 ))}
               </ul>

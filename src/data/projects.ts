@@ -11,7 +11,7 @@ export interface Project {
     live?: string;
     store?: string;
   };
-  status: "live" | "beta" | "in-progress" | "shipped";
+  status: "live" | "beta" | "early-signup" | "in-progress" | "shipped";
   featured?: boolean;
 }
 
@@ -27,7 +27,7 @@ export const projects: Project[] = [
     links: {
       live: "https://adeso.ai",
     },
-    status: "live",
+    status: "early-signup",
     featured: true,
   },
   {
@@ -38,7 +38,9 @@ export const projects: Project[] = [
       "A platform that gamifies learning through quests and challenges. Built from co-founder to solo maintainer — it's had a journey and keeps going.",
     category: "apps",
     tech: ["Nuxt 4", "TypeScript", "Prisma", "Fly.io", "PostgreSQL"],
-    links: {},
+    links: {
+      live: "https://questify.co",
+    },
     status: "beta",
     featured: true,
   },
@@ -53,7 +55,7 @@ export const projects: Project[] = [
     links: {
       live: "https://farsi-flash.vercel.app/",
     },
-    status: "live",
+    status: "beta",
     featured: true,
   },
   {
@@ -64,8 +66,10 @@ export const projects: Project[] = [
       "Portfolio tracker and analytics platform for prediction market traders. Covers Kalshi & Manifold — with arbitrage scanning, price alerts, shareable cards, and a Pro tier.",
     category: "apps",
     tech: ["Next.js 14", "Fastify", "Expo", "Supabase", "Stripe", "Railway"],
-    links: {},
-    status: "in-progress",
+    links: {
+      live: "https://edge-ledger-app.vercel.app/",
+    },
+    status: "beta",
   },
   {
     slug: "dink",
@@ -89,6 +93,17 @@ export const projects: Project[] = [
     links: {},
     status: "in-progress",
     featured: true,
+  },
+  {
+    slug: "hollow-castle",
+    name: "Hollow Castle",
+    tagline: "A game in development.",
+    description:
+      "A new game project currently in development, with the shape and details still being carved out through prototyping.",
+    category: "games",
+    tech: ["Game Design", "Prototyping"],
+    links: {},
+    status: "in-progress",
   },
   {
     slug: "piano-ar",
