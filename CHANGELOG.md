@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.1.0 - 2026-05-25
+
 - Updated location copy from Toronto to the Windsor/Detroit area in page metadata, the hero intro, and the about highlight.
 - Replaced the site favicon with an `SD` initials icon.
 - Added Vercel Web Analytics to the root layout.
