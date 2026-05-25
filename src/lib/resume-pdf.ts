@@ -166,20 +166,10 @@ function parseResumeMarkdown(markdown: string): ResumeBlock[] {
       continue;
     }
 
-    if (trimmed.startsWith("# ")) {
-      blocks.push({ text: stripMarkdown(trimmed.slice(2)), type: "h1" });
-      index += 1;
-      continue;
-    }
+    const heading = parseHeading(trimmed);
 
-    if (trimmed.startsWith("## ")) {
-      blocks.push({ text: stripMarkdown(trimmed.slice(3)), type: "h2" });
-      index += 1;
-      continue;
-    }
-
-    if (trimmed.startsWith("### ")) {
-      blocks.push({ text: stripMarkdown(trimmed.slice(4)), type: "h3" });
+    if (heading) {
+      blocks.push(heading);
       index += 1;
       continue;
     }
@@ -237,10 +227,36 @@ function parseResumeMarkdown(markdown: string): ResumeBlock[] {
 
     if (paragraph.length > 0) {
       blocks.push({ text: stripMarkdown(paragraph.join(" ")), type: "paragraph" });
+      continue;
     }
+
+    const fallbackText = stripMarkdown(trimmed.replace(/^#+\s*/, ""));
+
+    // Unsupported markdown markers still need to be consumed to guarantee parser progress.
+    if (fallbackText) {
+      blocks.push({ text: fallbackText, type: "paragraph" });
+    }
+
+    index += 1;
   }
 
   return blocks;
+}
+
+function parseHeading(line: string): ResumeBlock | null {
+  const match = /^(#{1,6})\s+(.+)$/.exec(line);
+
+  if (!match) {
+    return null;
+  }
+
+  const depth = match[1].length;
+  const type = depth === 1 ? "h1" : depth === 2 ? "h2" : "h3";
+
+  return {
+    text: stripMarkdown(match[2]),
+    type,
+  };
 }
 
 function parseTableRow(row: string): SkillRow | null {
