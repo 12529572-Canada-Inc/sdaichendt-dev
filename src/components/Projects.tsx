@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ExternalLink, ShoppingBag } from "lucide-react";
+import { ExternalLink, Gamepad2, ShoppingBag } from "lucide-react";
 import { projects, categories, type ProjectCategory } from "@/data/projects";
 
 const statusColors: Record<string, string> = {
@@ -91,8 +91,19 @@ export default function Projects() {
                 ))}
               </div>
 
-              {(project.links.live || project.links.store) && (
+              {(project.links.itch || project.links.live || project.links.store) && (
                 <div className="flex items-center gap-3 pt-1">
+                  {project.links.itch && (
+                    <a
+                      href={project.links.itch}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-1.5 text-sm text-cyan-400 hover:text-cyan-300 transition-colors"
+                    >
+                      <Gamepad2 size={14} />
+                      Itch.io
+                    </a>
+                  )}
                   {project.links.live && (
                     <a
                       href={project.links.live}

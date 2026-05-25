@@ -13,3 +13,5 @@
   - EdgeLedger links to `https://edge-ledger-app.vercel.app/` and is tagged as `Beta`.
 - Updated the current-work list to show only software consulting for Parallel42, linked to `https://www.p42systems.com/`.
 - Added a new in-progress game card for Hollow Castle.
+- Added an Elarya Studio game-dev brand card and itch.io links for Threshold and Hollow Castle.
+- Added a markdown-backed résumé source and dynamic PDF download route for the résumé button.
