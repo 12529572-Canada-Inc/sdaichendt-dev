@@ -8,6 +8,7 @@ export interface Project {
   category: Exclude<ProjectCategory, "all">;
   tech: string[];
   links: {
+    itch?: string;
     live?: string;
     store?: string;
   };
@@ -83,6 +84,19 @@ export const projects: Project[] = [
     status: "in-progress",
   },
   {
+    slug: "elarya-studio",
+    name: "Elarya Studio",
+    tagline: "Atmospheric indie games from Ontario.",
+    description:
+      "A one-person indie game studio building atmospheric, thoughtful games with a focus on cosmic horror, roguelikes, and experimental gameplay.",
+    category: "games",
+    tech: ["Godot", "Unity", "Game Design", "Indie Games"],
+    links: {
+      itch: "https://elarya-studio.itch.io/",
+    },
+    status: "live",
+  },
+  {
     slug: "threshold",
     name: "Threshold",
     tagline: "A deckbuilder at the edge of reason.",
@@ -90,7 +104,9 @@ export const projects: Project[] = [
       "A cosmic horror roguelite deckbuilder where sanity isn't just a stat — it warps the cards you can play. 131 cards, 21 relics, and a full run loop that will make you question your choices.",
     category: "games",
     tech: ["Godot 4", "GDScript"],
-    links: {},
+    links: {
+      itch: "https://elarya-studio.itch.io/unraveling",
+    },
     status: "in-progress",
     featured: true,
   },
@@ -102,7 +118,9 @@ export const projects: Project[] = [
       "A new game project currently in development, with the shape and details still being carved out through prototyping.",
     category: "games",
     tech: ["Game Design", "Prototyping"],
-    links: {},
+    links: {
+      itch: "https://elarya-studio.itch.io/hollow-castle",
+    },
     status: "in-progress",
   },
   {

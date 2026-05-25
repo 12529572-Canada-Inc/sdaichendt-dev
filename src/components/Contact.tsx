@@ -4,6 +4,8 @@ import { useState } from "react";
 import { Mail, Send } from "lucide-react";
 import { GithubIcon, LinkedinIcon } from "@/components/Icons";
 
+const contactEmail = "hello@sdaichendt.dev";
+
 function SubstackIcon({ size = 18, className = "" }: { size?: number; className?: string }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">
@@ -27,8 +29,8 @@ const socials = [
   },
   {
     label: "Email",
-    handle: "sdaichendt@adeso.ai",
-    href: "mailto:sdaichendt@adeso.ai",
+    handle: contactEmail,
+    href: `mailto:${contactEmail}`,
     icon: Mail,
   },
   {
@@ -52,7 +54,7 @@ export default function Contact() {
     const body = encodeURIComponent(
       `Name: ${form.name}\nEmail: ${form.email}\n\n${form.message}`
     );
-    window.location.href = `mailto:sdaichendt@adeso.ai?subject=${subject}&body=${body}`;
+    window.location.href = `mailto:${contactEmail}?subject=${subject}&body=${body}`;
 
     setTimeout(() => {
       setStatus("sent");
