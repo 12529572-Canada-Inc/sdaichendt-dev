@@ -64,7 +64,7 @@ export default function About() {
 
             <div className="mt-8">
               <a
-                href="/Shawn_Daichendt_Resume_2026.pdf"
+                href="/resume"
                 className="inline-flex items-center gap-2 text-sm text-cyan-400 hover:text-cyan-300 border border-cyan-400/30 hover:border-cyan-400/60 px-4 py-2.5 rounded-lg transition-all duration-200"
               >
                 Download résumé
