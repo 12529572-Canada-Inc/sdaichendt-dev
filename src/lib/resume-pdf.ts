@@ -385,7 +385,9 @@ function normalizePdfText(text: string): string {
     .replace(/[–—]/g, "-")
     .replace(/·/g, ",")
     .replace(/→/g, "->")
-    .replace(/[^\x20-\x7E]/g, "");
+    .replace(/[^\x20-\x7E]/g, "")
+    .replace(/\s+,/g, ",")
+    .replace(/,\s+/g, ", ");
 }
 
 function pdfString(text: string): string {
