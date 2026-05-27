@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ExternalLink, Gamepad2, ShoppingBag } from "lucide-react";
+import { ExternalLink, Gamepad2, Podcast, ShoppingBag } from "lucide-react";
 import { projects, categories, type ProjectCategory } from "@/data/projects";
 
 const statusColors: Record<string, string> = {
@@ -91,7 +91,10 @@ export default function Projects() {
                 ))}
               </div>
 
-              {(project.links.itch || project.links.live || project.links.store) && (
+              {(project.links.itch ||
+                project.links.live ||
+                project.links.podcast ||
+                project.links.store) && (
                 <div className="flex items-center gap-3 pt-1">
                   {project.links.itch && (
                     <a
@@ -113,6 +116,17 @@ export default function Projects() {
                     >
                       <ExternalLink size={14} />
                       Visit
+                    </a>
+                  )}
+                  {project.links.podcast && (
+                    <a
+                      href={project.links.podcast}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-1.5 text-sm text-cyan-400 hover:text-cyan-300 transition-colors"
+                    >
+                      <Podcast size={14} />
+                      Listen
                     </a>
                   )}
                   {project.links.store && (
