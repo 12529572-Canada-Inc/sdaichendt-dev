@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.2.0 - 2026-05-27
+
 - Added The Grasscast to the creative projects list and site copy.
 - Updated Dink to `Beta` and linked it to `https://dink-beta.vercel.app`.
 
