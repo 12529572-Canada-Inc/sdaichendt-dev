@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Added The Grasscast to the creative projects list and site copy.
+- Updated Dink to `Beta` and linked it to `https://dink-beta.vercel.app`.
+
 ## 1.1.0 - 2026-05-25
 
 - Updated location copy from Toronto to the Windsor/Detroit area in page metadata, the hero intro, and the about highlight.

@@ -10,6 +10,7 @@ export interface Project {
   links: {
     itch?: string;
     live?: string;
+    podcast?: string;
     store?: string;
   };
   status: "live" | "beta" | "early-signup" | "in-progress" | "shipped";
@@ -80,8 +81,10 @@ export const projects: Project[] = [
       "Meetup scheduling and skill tracking for pickleball players. Because the sport deserves better than group texts and Google Sheets.",
     category: "apps",
     tech: ["Next.js 14", "TypeScript", "Supabase", "Tailwind CSS", "Turborepo"],
-    links: {},
-    status: "in-progress",
+    links: {
+      live: "https://dink-beta.vercel.app",
+    },
+    status: "beta",
   },
   {
     slug: "elarya-studio",
@@ -133,6 +136,19 @@ export const projects: Project[] = [
     tech: ["Unity 6", "C#", "Meta XR SDK", "YOLOv8", "ONNX/Sentis", "URP"],
     links: {},
     status: "in-progress",
+  },
+  {
+    slug: "grasscast",
+    name: "The Grasscast",
+    tagline: "Games, life, and everything in-between.",
+    description:
+      "A podcast I co-host with Kwab Fordjour, interviewing friends, family, and other interesting people about games, what they are, and how they shape our lives and experiences.",
+    category: "creative",
+    tech: ["Podcasting", "Games", "Interviews", "Storytelling"],
+    links: {
+      podcast: "https://grasscast.captivate.fm/",
+    },
+    status: "live",
   },
   {
     slug: "player-piano",

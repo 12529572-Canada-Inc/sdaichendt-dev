@@ -47,8 +47,9 @@ export default function About() {
               <p>
                 I&apos;ve shipped production software for some big names (GM, Ford) and spent just as
                 much time building weird side projects that scratch my own itch — a language
-                learning app, a prediction market tracker, a cosmic horror card game, a piano
-                teacher for VR headsets. If the idea is interesting enough, I&apos;ll build it.
+                learning app, a prediction market tracker, a cosmic horror card game, a podcast
+                about games and life, and a piano teacher for VR headsets. If the idea is
+                interesting enough, I&apos;ll build it.
               </p>
               <p>
                 I&apos;m most at home in the full stack: Next.js on the front, Node on the back,
