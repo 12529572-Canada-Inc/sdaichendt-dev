@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Mail, Send } from "lucide-react";
+import { Calendar, Mail, Send } from "lucide-react";
 import { GithubIcon, LinkedinIcon } from "@/components/Icons";
 
 const contactEmail = "hello@sdaichendt.dev";
@@ -15,6 +15,12 @@ function SubstackIcon({ size = 18, className = "" }: { size?: number; className?
 }
 
 const socials = [
+  {
+    label: "Book a call",
+    handle: "Pick a time that works for you",
+    href: "/schedule",
+    icon: Calendar,
+  },
   {
     label: "GitHub",
     handle: "@djedi-knight",
@@ -136,8 +142,8 @@ export default function Contact() {
               <a
                 key={label}
                 href={href}
-                target={href.startsWith("mailto") ? undefined : "_blank"}
-                rel="noopener noreferrer"
+                target={href.startsWith("http") ? "_blank" : undefined}
+                rel={href.startsWith("http") ? "noopener noreferrer" : undefined}
                 className="flex items-center gap-4 bg-white/3 hover:bg-white/6 border border-white/8 hover:border-cyan-500/30 rounded-xl p-4 transition-all duration-200 group"
               >
                 <div className="w-10 h-10 rounded-xl bg-cyan-500/10 flex items-center justify-center shrink-0">

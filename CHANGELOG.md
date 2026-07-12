@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Added a `/schedule` booking page with a Cal.com inline embed and three meeting types (15-min quick chat, 30-min intro call, 60-min deep dive). (#8)
+- Linked the booking page from the hero CTA, nav, contact section, and footer.
+- Added OG/Twitter metadata for `/schedule` and documented Cal.com setup in the README.
+- Added a `NEXT_DIST_DIR` env override for the build output directory (useful for CI/sandboxed builds).
+
 ## 1.2.0 - 2026-05-27
 
 - Added The Grasscast to the creative projects list and site copy.
