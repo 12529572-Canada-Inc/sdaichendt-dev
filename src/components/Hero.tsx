@@ -1,4 +1,5 @@
-import { ArrowDown } from "lucide-react";
+import Link from "next/link";
+import { ArrowDown, Calendar } from "lucide-react";
 import { GithubIcon, LinkedinIcon } from "@/components/Icons";
 
 function SubstackIcon({ size = 20, className = "" }: { size?: number; className?: string }) {
@@ -43,6 +44,13 @@ export default function Hero() {
             >
               See my work
             </a>
+            <Link
+              href="/schedule"
+              className="flex items-center gap-2 border border-cyan-400/40 hover:border-cyan-400 text-cyan-300 hover:text-cyan-200 font-semibold px-6 py-3 rounded-lg transition-all duration-200"
+            >
+              <Calendar size={16} />
+              Book a call
+            </Link>
             <a
               href="#contact"
               className="border border-white/20 hover:border-cyan-400/50 text-white hover:text-cyan-300 font-semibold px-6 py-3 rounded-lg transition-all duration-200"
