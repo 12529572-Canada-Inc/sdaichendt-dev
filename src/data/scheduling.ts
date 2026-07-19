@@ -21,13 +21,13 @@ export const meetingTypes: MeetingType[] = [
     description: "A short slot for quick questions or a fast hello.",
   },
   {
-    slug: "intro-call-30",
+    slug: "30-minute-intro-call",
     title: "Intro call",
     duration: 30,
     description: "First conversation — recruiters, collaborators, new projects.",
   },
   {
-    slug: "deep-dive-60",
+    slug: "60-minute-deep-dive",
     title: "Deep dive",
     duration: 60,
     description: "A longer technical or project discussion.",

@@ -27,7 +27,7 @@ The booking page embeds [Cal.com](https://cal.com). Config lives in `src/data/sc
 One-time Cal.com setup (dashboard, not code):
 
 1. Create a Cal.com account and set the username to match `CAL_USERNAME` in `src/data/scheduling.ts` (currently `sdaichendt`), or update the constant to match your username.
-2. Create three event types with these exact slugs: `quick-chat-15` (15 min), `intro-call-30` (30 min), `deep-dive-60` (60 min).
+2. Create three event types with these exact slugs: `quick-chat-15` (15 min), `30-minute-intro-call` (30 min), `60-minute-deep-dive` (60 min).
 3. Set availability to weekdays after 10am ET, plus any buffer times.
 4. Connect Google Calendar for sync, invites, and conflict blocking.
 5. Confirmation and reminder emails are handled by Cal.com (Workflows for reminders).
