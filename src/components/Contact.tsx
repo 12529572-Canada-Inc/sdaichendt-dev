@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Calendar, Mail, Send } from "lucide-react";
 import { GithubIcon, LinkedinIcon } from "@/components/Icons";
 
-const contactEmail = "hello@sdaichendt.dev";
+const contactEmail = "me@sdaichendt.com";
 
 function SubstackIcon({ size = 18, className = "" }: { size?: number; className?: string }) {
   return (

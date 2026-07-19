@@ -123,8 +123,8 @@ export default function ScheduleEmbed() {
       <p className="text-gray-600 text-xs mt-6 text-center">
         Times shown in your local timezone. Availability is weekdays after 10am ET.
         Trouble booking? Email{" "}
-        <a href="mailto:hello@sdaichendt.dev" className="text-gray-500 hover:text-cyan-400 transition-colors underline">
-          hello@sdaichendt.dev
+        <a href="mailto:me@sdaichendt.com" className="text-gray-500 hover:text-cyan-400 transition-colors underline">
+          me@sdaichendt.com
         </a>
         .
       </p>
