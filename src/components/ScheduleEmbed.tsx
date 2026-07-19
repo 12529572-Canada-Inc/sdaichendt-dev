@@ -17,65 +17,68 @@ type CalFn = {
   q?: unknown[];
 };
 
-// Official Cal.com embed loader (https://cal.com/docs/embeds), adapted to TS.
+// Faithful port of the official Cal.com embed loader (https://cal.com/docs/embeds).
 function getCal(): CalFn {
   const w = window;
-  if (w.Cal?.loaded) return w.Cal;
+  if (w.Cal) return w.Cal;
 
-  const cal: CalFn = (...args: unknown[]) => {
-    const api: CalFn = (...apiArgs: unknown[]) => {
-      api.q?.push(apiArgs);
-    };
-    api.q = api.q ?? [];
+  const push = (fn: CalFn, args: unknown) => {
+    fn.q?.push(args);
+  };
 
-    if (typeof args[0] === "string" && args[0] === "init" && typeof args[1] === "string") {
-      // Namespaced init: Cal("init", "ns", {...})
-      const namespace = args[1];
-      cal.ns = cal.ns ?? {};
-      if (!cal.ns[namespace]) {
-        api.q.push(args.slice(2).length ? ["initNamespace", namespace, ...args.slice(2)] : ["initNamespace", namespace]);
-        cal.ns[namespace] = api;
+  const cal: CalFn = (...ar: unknown[]) => {
+    if (!cal.loaded) {
+      cal.ns = {};
+      cal.q = cal.q ?? [];
+      const script = document.createElement("script");
+      script.src = "https://app.cal.com/embed/embed.js";
+      document.head.appendChild(script);
+      cal.loaded = true;
+    }
+    if (ar[0] === "init") {
+      const api: CalFn = (...apiArgs: unknown[]) => {
+        push(api, apiArgs);
+      };
+      const namespace = ar[1];
+      api.q = api.q ?? [];
+      if (typeof namespace === "string") {
+        cal.ns![namespace] = cal.ns![namespace] || api;
+        push(cal.ns![namespace], ar);
+        push(cal, ["initNamespace", namespace]);
+      } else {
+        push(cal, ar);
       }
-      cal.q?.push(args);
       return;
     }
-    cal.q?.push(args);
+    push(cal, ar);
   };
-  cal.q = cal.q ?? [];
-  cal.ns = cal.ns ?? {};
-  cal.loaded = true;
+
   w.Cal = cal;
-
-  const script = document.createElement("script");
-  script.src = "https://app.cal.com/embed/embed.js";
-  script.async = true;
-  document.head.appendChild(script);
-
-  cal("init", { origin: "https://cal.com" });
   return cal;
 }
 
 export default function ScheduleEmbed() {
   const [active, setActive] = useState(meetingTypes[1] ?? meetingTypes[0]);
 
+  // Initialize every meeting type's embed once on mount.
   useEffect(() => {
     const cal = getCal();
-    const ns = active.slug;
-
-    cal("init", ns, { origin: "https://cal.com" });
-    const calNs = cal.ns?.[ns] ?? cal;
-
-    calNs("inline", {
-      elementOrSelector: `#cal-embed-${ns}`,
-      calLink: `${CAL_USERNAME}/${active.slug}`,
-      config: { layout: "month_view", theme: "dark" },
-    });
-    calNs("ui", {
-      theme: "dark",
-      cssVarsPerTheme: { dark: { "cal-brand": "#22d3ee" } },
-      hideEventTypeDetails: false,
-    });
-  }, [active]);
+    for (const mt of meetingTypes) {
+      cal("init", mt.slug, { origin: "https://cal.com" });
+      const calNs = cal.ns?.[mt.slug];
+      if (!calNs) continue;
+      calNs("inline", {
+        elementOrSelector: `#cal-embed-${mt.slug}`,
+        calLink: `${CAL_USERNAME}/${mt.slug}`,
+        config: { layout: "month_view", theme: "dark" },
+      });
+      calNs("ui", {
+        theme: "dark",
+        cssVarsPerTheme: { dark: { "cal-brand": "#22d3ee" } },
+        hideEventTypeDetails: false,
+      });
+    }
+  }, []);
 
   return (
     <div>
@@ -106,12 +109,16 @@ export default function ScheduleEmbed() {
         })}
       </div>
 
-      {/* Cal.com inline embed — keyed so each meeting type gets a fresh container */}
-      <div
-        key={active.slug}
-        id={`cal-embed-${active.slug}`}
-        className="min-h-[600px] w-full rounded-xl overflow-hidden"
-      />
+      {/* One pre-initialized Cal.com inline embed per meeting type; only the active one is visible */}
+      {meetingTypes.map((mt) => (
+        <div
+          key={mt.slug}
+          id={`cal-embed-${mt.slug}`}
+          className={`min-h-[600px] w-full rounded-xl overflow-hidden ${
+            mt.slug === active.slug ? "" : "hidden"
+          }`}
+        />
+      ))}
 
       <p className="text-gray-600 text-xs mt-6 text-center">
         Times shown in your local timezone. Availability is weekdays after 10am ET.
