@@ -5,6 +5,7 @@ import { Menu, X } from "lucide-react";
 
 const links = [
   { href: "#projects", label: "Projects" },
+  { href: "#contributions", label: "Open Source" },
   { href: "#about", label: "About" },
   { href: "#skills", label: "Skills" },
   { href: "#contact", label: "Contact" },
@@ -35,7 +36,7 @@ export default function Nav() {
         </a>
 
         {/* Desktop */}
-        <ul className="hidden md:flex items-center gap-8">
+        <ul className="hidden md:flex items-center gap-5 lg:gap-8">
           {links.map((l) => (
             <li key={l.href}>
               <a
