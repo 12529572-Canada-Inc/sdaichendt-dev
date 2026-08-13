@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Added an **Open Source Contributions** section (`src/data/contributions.ts`, `src/components/Contributions.tsx`) surfacing merged upstream PRs, starting with open-webui/open-webui#27571. Linked from the home page and nav. (#10)
+
 - Updated the contact email from `hello@sdaichendt.dev` to `me@sdaichendt.com` across the contact section and booking page.
 
 - Added a `/schedule` booking page with a Cal.com inline embed and three meeting types (15-min quick chat, 30-min intro call, 60-min deep dive). (#8)
