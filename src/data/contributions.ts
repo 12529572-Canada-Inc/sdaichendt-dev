@@ -15,7 +15,10 @@ export interface Contribution {
   /** Human-readable star count of the upstream repo, e.g. "148k". */
   stars?: string;
   merged: boolean;
-  /** ISO date (YYYY-MM-DD), used for sorting newest-first. */
+  /**
+   * ISO date (YYYY-MM-DD) used for sorting: the merge date for merged work,
+   * the date opened for PRs still in review.
+   */
   date: string;
 }
 
@@ -27,13 +30,30 @@ export const contributions: Contribution[] = [
     title:
       "Fix urlencoded form bodies encoding null as <nil> and objects as map[...]",
     prUrl: "https://github.com/grafana/k6/pull/6238",
+    commitUrl:
+      "https://github.com/grafana/k6/commit/bc073660bd0aec749d2a152a4951657854ebb918",
     issueUrl: "https://github.com/grafana/k6/issues/1185",
     description:
       "Fixed how k6 serialises JavaScript values into application/x-www-form-urlencoded request bodies. null and undefined now encode as empty values (key=) to match Node's querystring and jQuery, instead of the literal string <nil>, and nested objects and arrays log a warning rather than leaking Go's map[...] representation into the wire format. Backwards compatible — only the encoded output changes.",
     tech: ["Go", "JavaScript", "HTTP", "k6"],
     stars: "31k",
+    merged: true,
+    date: "2026-08-13",
+  },
+  {
+    slug: "grafana-k6-6249",
+    project: "grafana/k6",
+    projectUrl: "https://github.com/grafana/k6",
+    title:
+      "Test gRPC proto loading with server and client in separate processes",
+    prUrl: "https://github.com/grafana/k6/pull/6249",
+    issueUrl: "https://github.com/grafana/k6/issues/3552",
+    description:
+      "The existing gRPC tests ran the server and the k6 client in one process, so the client could reach server-registered types without ever loading a proto file. Added an end-to-end suite that runs the compiled k6 binary and a helper gRPC server as separate OS processes — covering unary, server-streaming and client-streaming calls, proto-file and reflection loading, and a negative control that fails when proto loading breaks. Gated behind the grpc_e2e build tag and wired into CI via a make grpc-e2e-tests target.",
+    tech: ["Go", "gRPC", "Protocol Buffers", "CI", "k6"],
+    stars: "31k",
     merged: false,
-    date: "2026-08-02",
+    date: "2026-08-06",
   },
   {
     slug: "open-webui-27571",
