@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- Added an **Open Source Contributions** section (`src/data/contributions.ts`, `src/components/Contributions.tsx`) surfacing merged upstream PRs, starting with open-webui/open-webui#27571. Linked from the home page and nav. (#10)
+- Added an **Open Source Contributions** section (`src/data/contributions.ts`, `src/components/Contributions.tsx`) surfacing merged upstream PRs, starting with open-webui/open-webui#27571 and grafana/k6#6238. Linked from the home page and nav. (#10)
 
 - Updated the contact email from `hello@sdaichendt.dev` to `me@sdaichendt.com` across the contact section and booking page.
 

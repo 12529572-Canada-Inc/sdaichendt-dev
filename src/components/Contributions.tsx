@@ -29,7 +29,7 @@ export default function Contributions() {
             Open source contributions
           </h2>
           <p className="text-gray-400 max-w-xl">
-            Fixes and improvements I&apos;ve shipped upstream to projects I
+            Fixes and improvements I&apos;ve contributed upstream to projects I
             don&apos;t own. Every entry links straight to the pull request.
           </p>
         </div>

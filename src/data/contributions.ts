@@ -21,6 +21,21 @@ export interface Contribution {
 
 export const contributions: Contribution[] = [
   {
+    slug: "grafana-k6-6238",
+    project: "grafana/k6",
+    projectUrl: "https://github.com/grafana/k6",
+    title:
+      "Fix urlencoded form bodies encoding null as <nil> and objects as map[...]",
+    prUrl: "https://github.com/grafana/k6/pull/6238",
+    issueUrl: "https://github.com/grafana/k6/issues/1185",
+    description:
+      "Fixed how k6 serialises JavaScript values into application/x-www-form-urlencoded request bodies. null and undefined now encode as empty values (key=) to match Node's querystring and jQuery, instead of the literal string <nil>, and nested objects and arrays log a warning rather than leaking Go's map[...] representation into the wire format. Backwards compatible — only the encoded output changes.",
+    tech: ["Go", "JavaScript", "HTTP", "k6"],
+    stars: "31k",
+    merged: false,
+    date: "2026-08-02",
+  },
+  {
     slug: "open-webui-27571",
     project: "open-webui/open-webui",
     projectUrl: "https://github.com/open-webui/open-webui",
@@ -39,7 +54,8 @@ export const contributions: Contribution[] = [
   },
 ];
 
-/** Newest contributions first. */
+/** Newest contributions first; merged work leads within the same date. */
 export const sortedContributions: Contribution[] = [...contributions].sort(
-  (a, b) => b.date.localeCompare(a.date),
+  (a, b) =>
+    b.date.localeCompare(a.date) || Number(b.merged) - Number(a.merged),
 );
