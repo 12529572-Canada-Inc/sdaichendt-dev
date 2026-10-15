@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.3.0 - 2026-10-15
+
 - Added an **Open Source Contributions** section (`src/data/contributions.ts`, `src/components/Contributions.tsx`) surfacing upstream pull requests (merged and in review), starting with grafana/k6#6238, grafana/k6#6249 and open-webui/open-webui#27571. Linked from the home page and nav. (#10)
 - Marked grafana/k6#6249 as merged (2026-10-15), linked its merge commit, and rewrote its description to reflect the final CI-workflow approach adopted in review. (#10)
 
