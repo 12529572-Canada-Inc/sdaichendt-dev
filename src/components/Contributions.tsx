@@ -32,10 +32,20 @@ const COPIES = 7;
 const MIDDLE_COPY = Math.floor(COPIES / 2);
 const CARD_GAP = 20; // matches `gap-5`
 const SETTLE_DELAY_MS = 150;
+/** How often the carousel advances on its own while nobody is touching it. */
+const AUTO_ADVANCE_MS = 5000;
+/** How long a manual interaction keeps auto-advance paused. */
+const INTERACTION_COOLDOWN_MS = 10000;
 
 export default function Contributions() {
   const trackRef = useRef<HTMLDivElement>(null);
   const settleTimer = useRef<number | null>(null);
+  /** True while the pointer or keyboard focus is on the carousel. */
+  const engagedRef = useRef(false);
+  /** True while the track is at least half visible in the viewport. */
+  const inViewRef = useRef(false);
+  /** Timestamp of the last deliberate user interaction with the carousel. */
+  const lastInteractionRef = useRef(0);
 
   /** Width of one full copy of the list, measured from the live DOM. */
   const copyWidth = useCallback(() => {
@@ -102,12 +112,73 @@ export default function Contributions() {
     };
   }, [recentre]);
 
-  const scrollByCard = (direction: -1 | 1) => {
+  const scrollByCard = useCallback((direction: -1 | 1) => {
     const track = trackRef.current;
     if (!track) return;
     const card = track.querySelector<HTMLElement>("[data-carousel-card]");
     const step = card ? card.offsetWidth + CARD_GAP : track.clientWidth;
     track.scrollBy({ left: direction * step, behavior: "smooth" });
+  }, []);
+
+  const markInteraction = useCallback(() => {
+    lastInteractionRef.current = Date.now();
+  }, []);
+
+  // Auto-advance while idle. Programmatic scrolls also fire `scroll`, so
+  // interaction is detected from input events rather than scroll position.
+  useEffect(() => {
+    const track = trackRef.current;
+    if (!track) return;
+
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        inViewRef.current = entry.isIntersecting;
+      },
+      { threshold: 0.5 },
+    );
+    observer.observe(track);
+
+    const inputEvents = ["wheel", "touchstart", "pointerdown", "keydown"] as const;
+    for (const type of inputEvents) {
+      track.addEventListener(type, markInteraction, { passive: true });
+    }
+
+    const timer = window.setInterval(() => {
+      if (
+        reducedMotion.matches ||
+        document.hidden ||
+        !inViewRef.current ||
+        engagedRef.current ||
+        Date.now() - lastInteractionRef.current < INTERACTION_COOLDOWN_MS
+      ) {
+        return;
+      }
+      scrollByCard(1);
+    }, AUTO_ADVANCE_MS);
+
+    return () => {
+      window.clearInterval(timer);
+      observer.disconnect();
+      for (const type of inputEvents) {
+        track.removeEventListener(type, markInteraction);
+      }
+    };
+  }, [markInteraction, scrollByCard]);
+
+  const handleNav = (direction: -1 | 1) => {
+    markInteraction();
+    scrollByCard(direction);
+  };
+
+  const engage = () => {
+    engagedRef.current = true;
+  };
+  const disengage = () => {
+    engagedRef.current = false;
+    // Leaving counts as an interaction so the carousel doesn't lurch
+    // the instant the pointer moves away.
+    markInteraction();
   };
 
   if (sortedContributions.length === 0) return null;
@@ -118,7 +189,14 @@ export default function Contributions() {
   const copies = Array.from({ length: COPIES }, (_, copy) => copy);
 
   return (
-    <section id="contributions" className="py-24 px-6">
+    <section
+      id="contributions"
+      className="py-24 px-6"
+      onPointerEnter={engage}
+      onPointerLeave={disengage}
+      onFocus={engage}
+      onBlur={disengage}
+    >
       <div className="max-w-6xl mx-auto">
         <div className="mb-12 flex flex-wrap items-end justify-between gap-6">
           <div>
@@ -133,7 +211,7 @@ export default function Contributions() {
           <div className="flex items-center gap-2">
             <button
               type="button"
-              onClick={() => scrollByCard(-1)}
+              onClick={() => handleNav(-1)}
               aria-label="Previous contributions"
               className={navButtonClass}
             >
@@ -141,7 +219,7 @@ export default function Contributions() {
             </button>
             <button
               type="button"
-              onClick={() => scrollByCard(1)}
+              onClick={() => handleNav(1)}
               aria-label="Next contributions"
               className={navButtonClass}
             >
