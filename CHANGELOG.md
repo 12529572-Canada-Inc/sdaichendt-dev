@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+## 1.4.0 - 2026-10-15
+
+- Updated project card statuses: Questify is now `Live`; EdgeLedger and Dink are now `Demo` (new status).
+- Added a `Beta` card for Phantom, a location-based alternate reality game with capture-the-flag mechanics and a cosmic horror theme (Expo, Convex, Fastify).
+- Project cards under **Things I've built** are now ordered by status: Live, then Beta, Demo, Early Signup, In Progress.
+- Open source contributions now render as a single row carousel with prev/next controls and snap scrolling instead of a two-column grid. The row repeats and loops endlessly in both directions, and advances on its own every few seconds while idle — pausing on hover, focus, and for a while after any manual interaction, and never for visitors who prefer reduced motion.
+
 ## 1.3.0 - 2026-10-15
 
 - Added an **Open Source Contributions** section (`src/data/contributions.ts`, `src/components/Contributions.tsx`) surfacing upstream pull requests (merged and in review), starting with grafana/k6#6238, grafana/k6#6249 and open-webui/open-webui#27571. Linked from the home page and nav. (#10)
