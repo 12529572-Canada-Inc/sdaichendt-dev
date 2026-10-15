@@ -1,6 +1,12 @@
 "use client";
 
-import { useCallback, useEffect, useLayoutEffect, useRef } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  type FocusEvent,
+} from "react";
 import {
   ChevronLeft,
   ChevronRight,
@@ -35,17 +41,23 @@ const SETTLE_DELAY_MS = 150;
 /** How often the carousel advances on its own while nobody is touching it. */
 const AUTO_ADVANCE_MS = 5000;
 /** How long a manual interaction keeps auto-advance paused. */
-const INTERACTION_COOLDOWN_MS = 10000;
+const INTERACTION_COOLDOWN_MS = 8000;
+/** How often the auto-advance deadline is checked. */
+const TICK_MS = 250;
+/** Fraction of the track that must be on screen for it to auto-advance. */
+const IN_VIEW_THRESHOLD = 0.2;
 
 export default function Contributions() {
   const trackRef = useRef<HTMLDivElement>(null);
   const settleTimer = useRef<number | null>(null);
-  /** True while the pointer or keyboard focus is on the carousel. */
-  const engagedRef = useRef(false);
-  /** True while the track is at least half visible in the viewport. */
+  /** True while the pointer is over the cards or the prev/next buttons. */
+  const hoveredRef = useRef(false);
+  /** True while keyboard focus is inside the carousel or its controls. */
+  const keyboardFocusRef = useRef(false);
+  /** True while a meaningful part of the track is visible in the viewport. */
   const inViewRef = useRef(false);
-  /** Timestamp of the last deliberate user interaction with the carousel. */
-  const lastInteractionRef = useRef(0);
+  /** Earliest time the carousel may advance on its own again. */
+  const nextAdvanceAtRef = useRef(0);
 
   /** Width of one full copy of the list, measured from the live DOM. */
   const copyWidth = useCallback(() => {
@@ -121,7 +133,7 @@ export default function Contributions() {
   }, []);
 
   const markInteraction = useCallback(() => {
-    lastInteractionRef.current = Date.now();
+    nextAdvanceAtRef.current = Date.now() + INTERACTION_COOLDOWN_MS;
   }, []);
 
   // Auto-advance while idle. Programmatic scrolls also fire `scroll`, so
@@ -135,31 +147,50 @@ export default function Contributions() {
       ([entry]) => {
         inViewRef.current = entry.isIntersecting;
       },
-      { threshold: 0.5 },
+      // Cards are tall, so on short viewports the track is often only partly
+      // on screen; only treat it as hidden once it is almost entirely out.
+      { threshold: IN_VIEW_THRESHOLD },
     );
     observer.observe(track);
 
-    const inputEvents = ["wheel", "touchstart", "pointerdown", "keydown"] as const;
+    // Vertical wheel events are the page scrolling past the carousel, not
+    // the user scrolling it; only a horizontal wheel counts as interaction.
+    const onWheel = (event: WheelEvent) => {
+      if (Math.abs(event.deltaX) > Math.abs(event.deltaY)) markInteraction();
+    };
+    const inputEvents = ["touchstart", "pointerdown", "keydown"] as const;
+    track.addEventListener("wheel", onWheel, { passive: true });
     for (const type of inputEvents) {
       track.addEventListener(type, markInteraction, { passive: true });
     }
 
+    nextAdvanceAtRef.current = Date.now() + AUTO_ADVANCE_MS;
     const timer = window.setInterval(() => {
-      if (
+      const now = Date.now();
+      const blocked =
         reducedMotion.matches ||
         document.hidden ||
         !inViewRef.current ||
-        engagedRef.current ||
-        Date.now() - lastInteractionRef.current < INTERACTION_COOLDOWN_MS
-      ) {
+        hoveredRef.current ||
+        keyboardFocusRef.current;
+      if (blocked) {
+        // Keep the deadline just ahead so that, once unblocked, the carousel
+        // waits a full interval before moving instead of lurching at once.
+        nextAdvanceAtRef.current = Math.max(
+          nextAdvanceAtRef.current,
+          now + AUTO_ADVANCE_MS,
+        );
         return;
       }
+      if (now < nextAdvanceAtRef.current) return;
       scrollByCard(1);
-    }, AUTO_ADVANCE_MS);
+      nextAdvanceAtRef.current = now + AUTO_ADVANCE_MS;
+    }, TICK_MS);
 
     return () => {
       window.clearInterval(timer);
       observer.disconnect();
+      track.removeEventListener("wheel", onWheel);
       for (const type of inputEvents) {
         track.removeEventListener(type, markInteraction);
       }
@@ -171,14 +202,21 @@ export default function Contributions() {
     scrollByCard(direction);
   };
 
-  const engage = () => {
-    engagedRef.current = true;
-  };
-  const disengage = () => {
-    engagedRef.current = false;
-    // Leaving counts as an interaction so the carousel doesn't lurch
-    // the instant the pointer moves away.
-    markInteraction();
+  const pauseHandlers = {
+    onPointerEnter: () => {
+      hoveredRef.current = true;
+    },
+    onPointerLeave: () => {
+      hoveredRef.current = false;
+    },
+    // Mouse clicks focus buttons too, but only keyboard focus should hold
+    // the carousel still; otherwise one click would pause it indefinitely.
+    onFocus: (event: FocusEvent<HTMLElement>) => {
+      if (event.target.matches(":focus-visible")) keyboardFocusRef.current = true;
+    },
+    onBlur: () => {
+      keyboardFocusRef.current = false;
+    },
   };
 
   if (sortedContributions.length === 0) return null;
@@ -189,14 +227,7 @@ export default function Contributions() {
   const copies = Array.from({ length: COPIES }, (_, copy) => copy);
 
   return (
-    <section
-      id="contributions"
-      className="py-24 px-6"
-      onPointerEnter={engage}
-      onPointerLeave={disengage}
-      onFocus={engage}
-      onBlur={disengage}
-    >
+    <section id="contributions" className="py-24 px-6">
       <div className="max-w-6xl mx-auto">
         <div className="mb-12 flex flex-wrap items-end justify-between gap-6">
           <div>
@@ -208,7 +239,7 @@ export default function Contributions() {
               I don&apos;t own. Every entry links straight to the pull request.
             </p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2" {...pauseHandlers}>
             <button
               type="button"
               onClick={() => handleNav(-1)}
@@ -230,6 +261,7 @@ export default function Contributions() {
 
         <div
           ref={trackRef}
+          {...pauseHandlers}
           className="carousel-track flex gap-5 overflow-x-auto snap-x snap-mandatory pb-2 -mx-6 px-6 md:mx-0 md:px-0"
         >
           {copies.flatMap((copy) =>
