@@ -47,13 +47,15 @@ export const contributions: Contribution[] = [
     title:
       "Test gRPC proto loading with server and client in separate processes",
     prUrl: "https://github.com/grafana/k6/pull/6249",
+    commitUrl:
+      "https://github.com/grafana/k6/commit/5aa229a66ee434b823b915633460a8a06181c475",
     issueUrl: "https://github.com/grafana/k6/issues/3552",
     description:
-      "The existing gRPC tests ran the server and the k6 client in one process, so the client could reach server-registered types without ever loading a proto file. Added an end-to-end suite that runs the compiled k6 binary and a helper gRPC server as separate OS processes — covering unary, server-streaming and client-streaming calls, proto-file and reflection loading, and a negative control that fails when proto loading breaks. Gated behind the grpc_e2e build tag and wired into CI via a make grpc-e2e-tests target.",
-    tech: ["Go", "gRPC", "Protocol Buffers", "CI", "k6"],
+      "k6's gRPC tests ran the server and client in one process, and because protobuf uses a process-global type registry the client could resolve server types without ever loading a .proto file — so the tests meant to cover runtime proto loading never exercised it. Added a gRPC E2E GitHub Actions workflow that builds k6 and the example gRPC server, runs them as separate OS processes, and executes every gRPC example script (unary, streaming, reflection, health checks) against it, failing on wrong server-computed replies, logged errors or failed checks. Also fixed a broken default proto path in the client-streaming example.",
+    tech: ["Go", "gRPC", "Protocol Buffers", "GitHub Actions", "k6"],
     stars: "31k",
-    merged: false,
-    date: "2026-08-06",
+    merged: true,
+    date: "2026-10-15",
   },
   {
     slug: "open-webui-27571",
