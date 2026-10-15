@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef } from "react";
 import {
   ChevronLeft,
   ChevronRight,
@@ -23,44 +23,99 @@ function formatDate(iso: string) {
   return Number.isNaN(parsed.getTime()) ? null : dateFormatter.format(parsed);
 }
 
+/**
+ * The track renders the list this many times so it can scroll endlessly.
+ * The middle copy is the "real" one; the others are decorative clones that
+ * let the user keep going in either direction while we quietly re-centre.
+ */
+const COPIES = 7;
+const MIDDLE_COPY = Math.floor(COPIES / 2);
+const CARD_GAP = 20; // matches `gap-5`
+const SETTLE_DELAY_MS = 150;
+
 export default function Contributions() {
   const trackRef = useRef<HTMLDivElement>(null);
-  const [canScrollPrev, setCanScrollPrev] = useState(false);
-  const [canScrollNext, setCanScrollNext] = useState(false);
+  const settleTimer = useRef<number | null>(null);
 
-  const updateScrollState = useCallback(() => {
+  /** Width of one full copy of the list, measured from the live DOM. */
+  const copyWidth = useCallback(() => {
     const track = trackRef.current;
-    if (!track) return;
-    const maxScroll = track.scrollWidth - track.clientWidth;
-    setCanScrollPrev(track.scrollLeft > 1);
-    setCanScrollNext(track.scrollLeft < maxScroll - 1);
+    if (!track) return 0;
+    const first = track.querySelector<HTMLElement>('[data-copy="0"]');
+    const next = track.querySelector<HTMLElement>('[data-copy="1"]');
+    return first && next ? next.offsetLeft - first.offsetLeft : 0;
   }, []);
+
+  /**
+   * Keep the scroll position inside the middle copy. Every copy is pixel
+   * identical, so shifting by whole copy widths is invisible to the user.
+   */
+  const recentre = useCallback(() => {
+    const track = trackRef.current;
+    const width = copyWidth();
+    if (!track || width === 0) return;
+    const min = width * MIDDLE_COPY;
+    const max = min + width;
+    const current = track.scrollLeft;
+    if (current >= min && current < max) return;
+    const offset = ((current % width) + width) % width;
+    track.scrollTo({ left: min + offset, behavior: "instant" });
+  }, [copyWidth]);
+
+  // Start on the middle copy before first paint so there is no visible jump.
+  useLayoutEffect(() => {
+    const track = trackRef.current;
+    const width = copyWidth();
+    if (!track || width === 0) return;
+    track.scrollTo({ left: width * MIDDLE_COPY, behavior: "instant" });
+  }, [copyWidth]);
 
   useEffect(() => {
     const track = trackRef.current;
     if (!track) return;
-    updateScrollState();
-    track.addEventListener("scroll", updateScrollState, { passive: true });
-    const observer = new ResizeObserver(updateScrollState);
+
+    const clearSettle = () => {
+      if (settleTimer.current !== null) {
+        window.clearTimeout(settleTimer.current);
+        settleTimer.current = null;
+      }
+    };
+    // `scrollend` is not available everywhere, so also debounce `scroll`.
+    const onScroll = () => {
+      clearSettle();
+      settleTimer.current = window.setTimeout(recentre, SETTLE_DELAY_MS);
+    };
+    const onScrollEnd = () => {
+      clearSettle();
+      recentre();
+    };
+
+    track.addEventListener("scroll", onScroll, { passive: true });
+    track.addEventListener("scrollend", onScrollEnd);
+    const observer = new ResizeObserver(recentre);
     observer.observe(track);
     return () => {
-      track.removeEventListener("scroll", updateScrollState);
+      clearSettle();
+      track.removeEventListener("scroll", onScroll);
+      track.removeEventListener("scrollend", onScrollEnd);
       observer.disconnect();
     };
-  }, [updateScrollState]);
+  }, [recentre]);
 
   const scrollByCard = (direction: -1 | 1) => {
     const track = trackRef.current;
     if (!track) return;
     const card = track.querySelector<HTMLElement>("[data-carousel-card]");
-    const step = card ? card.offsetWidth + 20 : track.clientWidth;
+    const step = card ? card.offsetWidth + CARD_GAP : track.clientWidth;
     track.scrollBy({ left: direction * step, behavior: "smooth" });
   };
 
   if (sortedContributions.length === 0) return null;
 
   const navButtonClass =
-    "flex items-center justify-center w-10 h-10 rounded-full border border-white/10 bg-white/5 text-gray-300 transition-colors hover:bg-white/10 hover:text-white disabled:opacity-30 disabled:hover:bg-white/5 disabled:hover:text-gray-300 disabled:cursor-not-allowed";
+    "flex items-center justify-center w-10 h-10 rounded-full border border-white/10 bg-white/5 text-gray-300 transition-colors hover:bg-white/10 hover:text-white";
+
+  const copies = Array.from({ length: COPIES }, (_, copy) => copy);
 
   return (
     <section id="contributions" className="py-24 px-6">
@@ -79,7 +134,6 @@ export default function Contributions() {
             <button
               type="button"
               onClick={() => scrollByCard(-1)}
-              disabled={!canScrollPrev}
               aria-label="Previous contributions"
               className={navButtonClass}
             >
@@ -88,7 +142,6 @@ export default function Contributions() {
             <button
               type="button"
               onClick={() => scrollByCard(1)}
-              disabled={!canScrollNext}
               aria-label="Next contributions"
               className={navButtonClass}
             >
@@ -99,109 +152,119 @@ export default function Contributions() {
 
         <div
           ref={trackRef}
-          className="carousel-track flex gap-5 overflow-x-auto snap-x snap-mandatory scroll-smooth pb-2 -mx-6 px-6 md:mx-0 md:px-0"
+          className="carousel-track flex gap-5 overflow-x-auto snap-x snap-mandatory pb-2 -mx-6 px-6 md:mx-0 md:px-0"
         >
-          {sortedContributions.map((contribution) => {
-            const merged = contribution.merged;
-            const formattedDate = formatDate(contribution.date);
+          {copies.flatMap((copy) =>
+            sortedContributions.map((contribution) => {
+              const merged = contribution.merged;
+              const formattedDate = formatDate(contribution.date);
+              const isClone = copy !== MIDDLE_COPY;
+              const linkTabIndex = isClone ? -1 : undefined;
 
-            return (
-              <div
-                key={contribution.slug}
-                data-carousel-card
-                className="group snap-start shrink-0 w-[85vw] max-w-[26rem] md:w-[26rem] bg-white/3 hover:bg-white/6 border border-white/8 hover:border-cyan-500/30 rounded-2xl p-6 flex flex-col gap-4 transition-all duration-300"
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <a
-                      href={contribution.projectUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-white font-semibold text-lg group-hover:text-cyan-300 transition-colors break-words"
-                    >
-                      {contribution.project}
-                    </a>
-                    <p className="text-cyan-400/70 text-sm mt-0.5 break-words">
-                      {contribution.title}
-                    </p>
-                  </div>
-                  <span
-                    className={`flex items-center gap-1 text-xs px-2.5 py-1 rounded-full border whitespace-nowrap ${
-                      merged
-                        ? "bg-purple-500/20 text-purple-300 border-purple-500/30"
-                        : "bg-amber-500/20 text-amber-400 border-amber-500/30"
-                    }`}
-                  >
-                    {merged ? <GitMerge size={12} /> : <GitPullRequest size={12} />}
-                    {merged ? "Merged" : "Open"}
-                  </span>
-                </div>
-
-                {(contribution.stars || formattedDate) && (
-                  <div className="flex items-center gap-4 text-xs text-gray-500 -mt-2">
-                    {contribution.stars && (
-                      <span className="flex items-center gap-1">
-                        <Star size={12} />
-                        {contribution.stars} stars
-                      </span>
-                    )}
-                    {formattedDate && <span>{formattedDate}</span>}
-                  </div>
-                )}
-
-                <p className="text-gray-400 text-sm leading-relaxed flex-1">
-                  {contribution.description}
-                </p>
-
-                {contribution.tech.length > 0 && (
-                  <div className="flex flex-wrap gap-1.5">
-                    {contribution.tech.map((t) => (
-                      <span
-                        key={t}
-                        className="text-xs bg-white/5 text-gray-400 px-2 py-0.5 rounded-md border border-white/8"
+              return (
+                <div
+                  key={`${copy}-${contribution.slug}`}
+                  data-carousel-card
+                  data-copy={copy}
+                  aria-hidden={isClone || undefined}
+                  className="group snap-start shrink-0 w-[85vw] max-w-[26rem] md:w-[26rem] bg-white/3 hover:bg-white/6 border border-white/8 hover:border-cyan-500/30 rounded-2xl p-6 flex flex-col gap-4 transition-all duration-300"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <a
+                        href={contribution.projectUrl}
+                        tabIndex={linkTabIndex}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-white font-semibold text-lg group-hover:text-cyan-300 transition-colors break-words"
                       >
-                        {t}
-                      </span>
-                    ))}
+                        {contribution.project}
+                      </a>
+                      <p className="text-cyan-400/70 text-sm mt-0.5 break-words">
+                        {contribution.title}
+                      </p>
+                    </div>
+                    <span
+                      className={`flex items-center gap-1 text-xs px-2.5 py-1 rounded-full border whitespace-nowrap ${
+                        merged
+                          ? "bg-purple-500/20 text-purple-300 border-purple-500/30"
+                          : "bg-amber-500/20 text-amber-400 border-amber-500/30"
+                      }`}
+                    >
+                      {merged ? <GitMerge size={12} /> : <GitPullRequest size={12} />}
+                      {merged ? "Merged" : "Open"}
+                    </span>
                   </div>
-                )}
 
-                <div className="flex flex-wrap items-center gap-x-4 gap-y-2 pt-1">
-                  <a
-                    href={contribution.prUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-1.5 text-sm text-cyan-400 hover:text-cyan-300 transition-colors"
-                  >
-                    <GitPullRequest size={14} />
-                    View PR
-                  </a>
-                  {contribution.commitUrl && (
+                  {(contribution.stars || formattedDate) && (
+                    <div className="flex items-center gap-4 text-xs text-gray-500 -mt-2">
+                      {contribution.stars && (
+                        <span className="flex items-center gap-1">
+                          <Star size={12} />
+                          {contribution.stars} stars
+                        </span>
+                      )}
+                      {formattedDate && <span>{formattedDate}</span>}
+                    </div>
+                  )}
+
+                  <p className="text-gray-400 text-sm leading-relaxed flex-1">
+                    {contribution.description}
+                  </p>
+
+                  {contribution.tech.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5">
+                      {contribution.tech.map((t) => (
+                        <span
+                          key={t}
+                          className="text-xs bg-white/5 text-gray-400 px-2 py-0.5 rounded-md border border-white/8"
+                        >
+                          {t}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+
+                  <div className="flex flex-wrap items-center gap-x-4 gap-y-2 pt-1">
                     <a
-                      href={contribution.commitUrl}
+                      href={contribution.prUrl}
+                      tabIndex={linkTabIndex}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-1.5 text-sm text-gray-400 hover:text-white transition-colors"
+                      className="flex items-center gap-1.5 text-sm text-cyan-400 hover:text-cyan-300 transition-colors"
                     >
-                      <GitCommitHorizontal size={14} />
-                      Commit
+                      <GitPullRequest size={14} />
+                      View PR
                     </a>
-                  )}
-                  {contribution.issueUrl && (
-                    <a
-                      href={contribution.issueUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-1.5 text-sm text-gray-400 hover:text-white transition-colors"
-                    >
-                      <ExternalLink size={14} />
-                      Issue
-                    </a>
-                  )}
+                    {contribution.commitUrl && (
+                      <a
+                        href={contribution.commitUrl}
+                        tabIndex={linkTabIndex}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-1.5 text-sm text-gray-400 hover:text-white transition-colors"
+                      >
+                        <GitCommitHorizontal size={14} />
+                        Commit
+                      </a>
+                    )}
+                    {contribution.issueUrl && (
+                      <a
+                        href={contribution.issueUrl}
+                        tabIndex={linkTabIndex}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-1.5 text-sm text-gray-400 hover:text-white transition-colors"
+                      >
+                        <ExternalLink size={14} />
+                        Issue
+                      </a>
+                    )}
+                  </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            }),
+          )}
         </div>
       </div>
     </section>
