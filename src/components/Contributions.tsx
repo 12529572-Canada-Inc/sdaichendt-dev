@@ -1,4 +1,9 @@
+"use client";
+
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
+  ChevronLeft,
+  ChevronRight,
   ExternalLink,
   GitCommitHorizontal,
   GitMerge,
@@ -19,22 +24,83 @@ function formatDate(iso: string) {
 }
 
 export default function Contributions() {
+  const trackRef = useRef<HTMLDivElement>(null);
+  const [canScrollPrev, setCanScrollPrev] = useState(false);
+  const [canScrollNext, setCanScrollNext] = useState(false);
+
+  const updateScrollState = useCallback(() => {
+    const track = trackRef.current;
+    if (!track) return;
+    const maxScroll = track.scrollWidth - track.clientWidth;
+    setCanScrollPrev(track.scrollLeft > 1);
+    setCanScrollNext(track.scrollLeft < maxScroll - 1);
+  }, []);
+
+  useEffect(() => {
+    const track = trackRef.current;
+    if (!track) return;
+    updateScrollState();
+    track.addEventListener("scroll", updateScrollState, { passive: true });
+    const observer = new ResizeObserver(updateScrollState);
+    observer.observe(track);
+    return () => {
+      track.removeEventListener("scroll", updateScrollState);
+      observer.disconnect();
+    };
+  }, [updateScrollState]);
+
+  const scrollByCard = (direction: -1 | 1) => {
+    const track = trackRef.current;
+    if (!track) return;
+    const card = track.querySelector<HTMLElement>("[data-carousel-card]");
+    const step = card ? card.offsetWidth + 20 : track.clientWidth;
+    track.scrollBy({ left: direction * step, behavior: "smooth" });
+  };
+
   if (sortedContributions.length === 0) return null;
+
+  const navButtonClass =
+    "flex items-center justify-center w-10 h-10 rounded-full border border-white/10 bg-white/5 text-gray-300 transition-colors hover:bg-white/10 hover:text-white disabled:opacity-30 disabled:hover:bg-white/5 disabled:hover:text-gray-300 disabled:cursor-not-allowed";
 
   return (
     <section id="contributions" className="py-24 px-6">
       <div className="max-w-6xl mx-auto">
-        <div className="mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-            Open source contributions
-          </h2>
-          <p className="text-gray-400 max-w-xl">
-            Fixes and improvements I&apos;ve contributed upstream to projects I
-            don&apos;t own. Every entry links straight to the pull request.
-          </p>
+        <div className="mb-12 flex flex-wrap items-end justify-between gap-6">
+          <div>
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+              Open source contributions
+            </h2>
+            <p className="text-gray-400 max-w-xl">
+              Fixes and improvements I&apos;ve contributed upstream to projects
+              I don&apos;t own. Every entry links straight to the pull request.
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => scrollByCard(-1)}
+              disabled={!canScrollPrev}
+              aria-label="Previous contributions"
+              className={navButtonClass}
+            >
+              <ChevronLeft size={18} />
+            </button>
+            <button
+              type="button"
+              onClick={() => scrollByCard(1)}
+              disabled={!canScrollNext}
+              aria-label="Next contributions"
+              className={navButtonClass}
+            >
+              <ChevronRight size={18} />
+            </button>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div
+          ref={trackRef}
+          className="carousel-track flex gap-5 overflow-x-auto snap-x snap-mandatory scroll-smooth pb-2 -mx-6 px-6 md:mx-0 md:px-0"
+        >
           {sortedContributions.map((contribution) => {
             const merged = contribution.merged;
             const formattedDate = formatDate(contribution.date);
@@ -42,7 +108,8 @@ export default function Contributions() {
             return (
               <div
                 key={contribution.slug}
-                className="group bg-white/3 hover:bg-white/6 border border-white/8 hover:border-cyan-500/30 rounded-2xl p-6 flex flex-col gap-4 transition-all duration-300"
+                data-carousel-card
+                className="group snap-start shrink-0 w-[85vw] max-w-[26rem] md:w-[26rem] bg-white/3 hover:bg-white/6 border border-white/8 hover:border-cyan-500/30 rounded-2xl p-6 flex flex-col gap-4 transition-all duration-300"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">

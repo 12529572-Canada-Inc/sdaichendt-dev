@@ -2,19 +2,26 @@
 
 import { useState } from "react";
 import { ExternalLink, Gamepad2, Podcast, ShoppingBag } from "lucide-react";
-import { projects, categories, type ProjectCategory } from "@/data/projects";
+import {
+  sortedProjects,
+  categories,
+  type ProjectCategory,
+  type ProjectStatus,
+} from "@/data/projects";
 
-const statusColors: Record<string, string> = {
+const statusColors: Record<ProjectStatus, string> = {
   live: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30",
   beta: "bg-blue-500/20 text-blue-400 border-blue-500/30",
+  demo: "bg-fuchsia-500/20 text-fuchsia-300 border-fuchsia-500/30",
   "early-signup": "bg-cyan-500/20 text-cyan-300 border-cyan-500/30",
   "in-progress": "bg-amber-500/20 text-amber-400 border-amber-500/30",
   shipped: "bg-purple-500/20 text-purple-400 border-purple-500/30",
 };
 
-const statusLabels: Record<string, string> = {
+const statusLabels: Record<ProjectStatus, string> = {
   live: "Live",
   beta: "Beta",
+  demo: "Demo",
   "early-signup": "Early Signup",
   "in-progress": "In Progress",
   shipped: "Shipped",
@@ -24,7 +31,9 @@ export default function Projects() {
   const [active, setActive] = useState<ProjectCategory>("all");
 
   const filtered =
-    active === "all" ? projects : projects.filter((p) => p.category === active);
+    active === "all"
+      ? sortedProjects
+      : sortedProjects.filter((p) => p.category === active);
 
   return (
     <section id="projects" className="py-24 px-6">

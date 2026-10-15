@@ -13,9 +13,30 @@ export interface Project {
     podcast?: string;
     store?: string;
   };
-  status: "live" | "beta" | "early-signup" | "in-progress" | "shipped";
+  status: ProjectStatus;
   featured?: boolean;
 }
+
+export type ProjectStatus =
+  | "live"
+  | "beta"
+  | "demo"
+  | "early-signup"
+  | "in-progress"
+  | "shipped";
+
+/**
+ * Display order for the project grid: production work first, then things
+ * people can try, then what is still being built.
+ */
+export const statusOrder: ProjectStatus[] = [
+  "live",
+  "beta",
+  "demo",
+  "early-signup",
+  "in-progress",
+  "shipped",
+];
 
 export const projects: Project[] = [
   {
@@ -43,7 +64,7 @@ export const projects: Project[] = [
     links: {
       live: "https://questify.co",
     },
-    status: "beta",
+    status: "live",
     featured: true,
   },
   {
@@ -71,7 +92,7 @@ export const projects: Project[] = [
     links: {
       live: "https://edge-ledger-app.vercel.app/",
     },
-    status: "beta",
+    status: "demo",
   },
   {
     slug: "dink",
@@ -84,7 +105,7 @@ export const projects: Project[] = [
     links: {
       live: "https://dink-beta.vercel.app",
     },
-    status: "beta",
+    status: "demo",
   },
   {
     slug: "elarya-studio",
@@ -98,6 +119,18 @@ export const projects: Project[] = [
       itch: "https://elarya-studio.itch.io/",
     },
     status: "live",
+  },
+  {
+    slug: "phantom",
+    name: "Phantom",
+    tagline: "Capture the flag. Mind the dark.",
+    description:
+      "A location-based alternate reality game with capture-the-flag mechanics and a cosmic horror theme. Teams hold real-world zones, background location drives captures, and the city becomes the board.",
+    category: "games",
+    tech: ["Expo", "React Native", "Convex", "Fastify", "TypeScript", "Turborepo"],
+    links: {},
+    status: "beta",
+    featured: true,
   },
   {
     slug: "threshold",
@@ -176,6 +209,11 @@ export const projects: Project[] = [
     status: "live",
   },
 ];
+
+/** Projects grouped by status (see `statusOrder`), keeping data order within a status. */
+export const sortedProjects: Project[] = [...projects].sort(
+  (a, b) => statusOrder.indexOf(a.status) - statusOrder.indexOf(b.status),
+);
 
 export const categories: { id: ProjectCategory; label: string }[] = [
   { id: "all", label: "All" },
